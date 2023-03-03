@@ -48,7 +48,7 @@ const LAB_BUILD = {
     },
     plugins: [
         lessLoader(),
-        WasmPlugin(true), 
+        WasmPlugin(true),
         WorkerPlugin({ inline: true }),
 
         // See note in `rust/perspective-viewer/build.js`
