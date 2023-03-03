@@ -18,12 +18,6 @@ const NBEXTENSION_PATH = path.resolve(
     "static"
 );
 
-const THEMES_BUILD = {
-    entryPoints: ["src/less/index.less"],
-    plugins: [WasmPlugin(false)],
-    outdir: "dist/css",
-};
-
 const TEST_BUILD = {
     entryPoints: ["src/js/psp_widget.js"],
     define: {
@@ -121,7 +115,6 @@ async function build_all() {
         builder3.compile().get("index.css")
     );
 
-    await build(THEMES_BUILD);
     await Promise.all(BUILD.map(build)).catch(() => process.exit(1));
     cpy(["dist/css/*"], "dist/umd");
     cpy(["src/less/*"], "dist/less");
