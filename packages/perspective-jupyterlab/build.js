@@ -1,5 +1,4 @@
 const cpy_mod = import("cpy");
-const { lessLoader } = require("esbuild-plugin-less");
 const { WasmPlugin } = require("@finos/perspective-esbuild-plugin/wasm");
 const { WorkerPlugin } = require("@finos/perspective-esbuild-plugin/worker");
 const { AMDLoader } = require("@finos/perspective-esbuild-plugin/amd");
@@ -21,7 +20,7 @@ const NBEXTENSION_PATH = path.resolve(
 
 const THEMES_BUILD = {
     entryPoints: ["src/less/index.less"],
-    plugins: [WasmPlugin(false), lessLoader()],
+    plugins: [WasmPlugin(false)],
     outdir: "dist/css",
 };
 
@@ -47,7 +46,6 @@ const LAB_BUILD = {
         global: "window",
     },
     plugins: [
-        lessLoader(),
         WasmPlugin(true),
         WorkerPlugin({ inline: true }),
 
