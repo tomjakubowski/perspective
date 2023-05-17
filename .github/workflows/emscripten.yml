@@ -57,6 +57,9 @@ jobs:
           yarn
           yarn build_python --setup-only
 
+      - name: install boost
+          node scripts/install_tools.js
+
       - name: Install pyodide-build
         run: pip install pyodide-build==$PYODIDE_VERSION
 
