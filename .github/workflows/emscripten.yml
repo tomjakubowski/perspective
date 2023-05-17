@@ -54,11 +54,12 @@ jobs:
       - name: copy files
         run: |
           npm install -g yarn
-          yarn
+          yarn --frozen-lockfile
           yarn build_python --setup-only
 
-      - name: install boost
-          node scripts/install_tools.js
+      - name: Linux init steps
+        run: sudo node scripts/install_tools.js
+
 
       - name: Install pyodide-build
         run: pip install pyodide-build==$PYODIDE_VERSION
