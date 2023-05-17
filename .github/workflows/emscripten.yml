@@ -53,6 +53,7 @@ jobs:
 
       - name: copy files
         run: 
+          npm install -g yarn
           yarn
           yarn build_python --setup-only
 
