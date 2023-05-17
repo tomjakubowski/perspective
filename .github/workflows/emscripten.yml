@@ -27,6 +27,7 @@ jobs:
       # "info" field, or in Makefile.envs:
       # https://github.com/pyodide/pyodide/blob/main/Makefile.envs#L2
       PYTHON_VERSION: 3.11.2
+      PYODIDE_SHORTVERSION: 311
       EMSCRIPTEN_VERSION: 3.1.32
       NODE_VERSION: 18
     steps:
@@ -64,24 +65,29 @@ jobs:
         run: pip install pyodide-build==$PYODIDE_VERSION
 
       - name: Build
-        # Without --export=pyinit, pyodide-build tries to export all symbols from every .o,
-        # which causes the em++ compiler
-        # --export=pyinit
+        # Without --exports=pyinit, pyodide-build tries to export all symbols from every .o,
+        # which causes the em++ linker command line invocation to be too long.
         run: pyodide build python/perspective --exports=pyinit
 
-      - name: set up node
-        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+      - name: Upload pyodide wheel
+        uses: actions/upload-artifact@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
+            name: perspective-python-dist-pyodide-${{ env.PYODIDE_SHORTVERSION }}
+            path: dist/*.whl
 
-      - name: Set up Pyodide virtual environment
-        run: |
-          pyodide venv .venv-pyodide
-          source .venv-pyodide/bin/activate
-          pip install dist/*.whl
-          pip install -r test_requirements.txt
-      - name: Test
-        run: |
-          source .venv-pyodide/bin/activate
-          cd ..
-          python numpy/runtests.py -n -vv
+      # - name: set up node
+      #   uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+      #   with:
+      #     node-version: ${{ env.NODE_VERSION }}
+
+      # - name: Set up Pyodide virtual environment
+      #   run: |
+      #     pyodide venv .venv-pyodide
+      #     source .venv-pyodide/bin/activate
+      #     pip install dist/*.whl
+      #     pip install -r test_requirements.txt
+      # - name: Test
+      #   run: |
+      #     source .venv-pyodide/bin/activate
+      #     cd ..
+      #     python numpy/runtests.py -n -vv
