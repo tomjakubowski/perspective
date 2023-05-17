@@ -1,7 +1,11 @@
-# Adapted from 
-name: Test Emscripten/Pyodide build
+# Adapted from https://raw.githubusercontent.com/numpy/numpy/main/.github/workflows/emscripten.yml
+name: Emscripten/Pyodide build
 
 on:
+  push:
+    branches:
+      - '*jupyterlite*'
+      - '*pyodide*'
   pull_request:
     branches:
       - master
