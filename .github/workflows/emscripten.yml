@@ -67,7 +67,7 @@ jobs:
         # Without --export=pyinit, pyodide-build tries to export all symbols from every .o,
         # which causes the em++ compiler
         # --export=pyinit
-        run: pyodide build python/perspective --export=pyinit
+        run: pyodide build python/perspective --exports=pyinit
 
       - name: set up node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
