@@ -60,12 +60,14 @@ jobs:
       - name: Linux init steps
         run: sudo node scripts/install_tools.js
 
-
       - name: Install pyodide-build
         run: pip install pyodide-build==$PYODIDE_VERSION
 
       - name: Build
-        run: pyodide build python/perspective
+        # Without --export=pyinit, pyodide-build tries to export all symbols from every .o,
+        # which causes the em++ compiler
+        # --export=pyinit
+        run: pyodide build python/perspective --export=pyinit
 
       - name: set up node
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
