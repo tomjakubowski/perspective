@@ -51,6 +51,11 @@ jobs:
           version: ${{ env.EMSCRIPTEN_VERSION }}
           actions-cache-folder: emsdk-cache
 
+      - name: copy files
+        run: 
+          yarn
+          yarn build_python --setup-only
+
       - name: Install pyodide-build
         run: pip install pyodide-build==$PYODIDE_VERSION
 
