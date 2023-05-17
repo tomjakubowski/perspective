@@ -52,7 +52,7 @@ jobs:
           actions-cache-folder: emsdk-cache
 
       - name: copy files
-        run: 
+        run: |
           npm install -g yarn
           yarn
           yarn build_python --setup-only
@@ -68,14 +68,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # - name: Set up Pyodide virtual environment
-      #   run: |
-      #     pyodide venv .venv-pyodide
-      #     source .venv-pyodide/bin/activate
-      #     pip install dist/*.whl
-      #     pip install -r test_requirements.txt
-      # - name: Test
-      #   run: |
-      #     source .venv-pyodide/bin/activate
-      #     cd ..
-      #     python numpy/runtests.py -n -vv
+      - name: Set up Pyodide virtual environment
+        run: |
+          pyodide venv .venv-pyodide
+          source .venv-pyodide/bin/activate
+          pip install dist/*.whl
+          pip install -r test_requirements.txt
+      - name: Test
+        run: |
+          source .venv-pyodide/bin/activate
+          cd ..
+          python numpy/runtests.py -n -vv
