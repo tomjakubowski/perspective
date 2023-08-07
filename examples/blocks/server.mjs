@@ -62,6 +62,7 @@ const gists = [
     "olympics",
     "editable",
     "csv",
+    "feather",
 ];
 
 const lis = [];

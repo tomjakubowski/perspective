@@ -87,6 +87,8 @@ set(ARROW_SRCS
     ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/byte_size.cc
     ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/cancel.cc
     ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/compression.cc
+    # ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/compression_lz4.cc
+    # ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/compression_zstd.cc
     ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/counting_semaphore.cc
     ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/cpu_info.cc
     ${CMAKE_BINARY_DIR}/arrow-src/cpp/src/arrow/util/debug.cc
@@ -274,6 +276,8 @@ add_library(arrow STATIC ${ARROW_SRCS})
 
 target_compile_definitions(arrow PUBLIC ARROW_NO_DEPRECATED_API)
 target_compile_definitions(arrow PUBLIC ARROW_STATIC)
+# target_compile_definitions(arrow PUBLIC ARROW_WITH_ZSTD=ON)
+target_compile_definitions(arrow PUBLIC ARROW_WITH_LZ4=ON)
 
 # will need built boost filesystem and system .lib to work, even though
 # perspective itself does not use those dependencies

@@ -1,3 +1,11 @@
+# Licensed from VTK under BSD 3 clause License
+#
+# Copyright (c) 1993-2015 Ken Martin, Will Schroeder, Bill Lorensen
+# All rights reserved.
+#
+# https://github.com/Kitware/VTK/blob/e78c3a611df2114d7b8738537a72a6b08abfdb87/Copyright.txt
+# https://github.com/Kitware/VTK/blob/e78c3a611df2114d7b8738537a72a6b08abfdb87/CMake/FindLZ4.cmake
+
 cmake_minimum_required(VERSION 3.7.2)
 
 #   Program:   Visualization Toolkit

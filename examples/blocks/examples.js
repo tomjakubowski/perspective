@@ -13,6 +13,7 @@
 const LOCAL_EXAMPLES = [
     "editable",
     "csv",
+    "feather",
     "fractal",
     "market",
     "raycasting",
