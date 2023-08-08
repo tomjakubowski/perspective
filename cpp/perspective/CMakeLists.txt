@@ -201,12 +201,13 @@ if(PSP_WASM_BUILD)
     # ###################
     # EMSCRIPTEN BUILD #
     # ###################
+    message("qqqq !!!! WASM BUILD !!!!")
     execute_process(COMMAND which emcc OUTPUT_VARIABLE EMCC)
     execute_process(COMMAND which em++ OUTPUT_VARIABLE EMPP)
     string(STRIP "${EMCC}" EMCC)
     string(STRIP "${EMPP}" EMPP)
-    set(CMAKE_C_COMPILER ${EMCC})
-    set(CMAKE_CXX_COMPILER ${EMPP})
+    # set(CMAKE_C_COMPILER ${EMCC})
+    # set(CMAKE_CXX_COMPILER ${EMPP})
     set(CMAKE_TOOLCHAIN_FILE "$ENV{EMSCRIPTEN_ROOT}/cmake/Modules/Platform/Emscripten.cmake")
     set(CMAKE_AR emar)
     set(CMAKE_RANLIB emranlib)
@@ -380,6 +381,7 @@ psp_build_message("${Cyan}Building minimal Apache Arrow${ColorReset}")
 psp_build_dep("rapidjson" "${PSP_CMAKE_MODULE_PATH}/rapidjson.txt.in")
 psp_build_dep("double-conversion" "${PSP_CMAKE_MODULE_PATH}/double-conversion.txt.in")
 psp_build_dep("flatbuffers" "${PSP_CMAKE_MODULE_PATH}/flatbuffers.txt.in")
+
 psp_build_dep("lz4" "${PSP_CMAKE_MODULE_PATH}/lz4.txt.in")
 
 # Build minimal arrow itself

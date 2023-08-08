@@ -3,18 +3,24 @@ cmake_minimum_required(VERSION 3.7.2)
 project(lz4-download NONE)
 
 include(ExternalProject)
+message("QQQQ CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
+# ExternalProject_Add(lz4
+#   GIT_REPOSITORY    https://github.com/lz4/lz4.git
+#   GIT_TAG           v1.9.4
+#   SOURCE_DIR        "${CMAKE_BINARY_DIR}/lz4-src"
+#   SOURCE_SUBDIR     build/cmake
+#   INSTALL_COMMAND   ""
+#   TEST_COMMAND      ""
+#   CMAKE_ARGS        " -DBUILD_SHARED_LIBS=OFF -DBUILD_STATIC_LIBS=ON -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+# )
 ExternalProject_Add(lz4
   GIT_REPOSITORY    https://github.com/lz4/lz4.git
   GIT_TAG           v1.9.4
   SOURCE_DIR        "${CMAKE_BINARY_DIR}/lz4-src"
   BINARY_DIR        "${CMAKE_BINARY_DIR}/lz4-build"
-  SOURCE_SUBDIR     "./build/cmake"
-  # CONFIGURE_COMMAND "build/cmake"
-  # CONFIGURE_COMMAND ""
-  # BUILD_IN_SOURCE   1
-  # BUILD_COMMAND     "build/cmake"
-  # BUILD_COMMAND     ""
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
   INSTALL_COMMAND   ""
   TEST_COMMAND      ""
-  CMAKE_ARGS        " -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+  CMAKE_ARGS        " -DBUILD_SHARED_LIBS=OFF -DBUILD_STATIC_LIBS=ON -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
 )
