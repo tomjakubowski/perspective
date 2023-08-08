@@ -285,6 +285,7 @@ target_link_libraries(arrow
     ${double-conversion_LIBRARIES}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
+    lz4_static
     ${ARROW_TEST_LINK_TOOLCHAIN})
 
 # find_package(Flatbuffers)
