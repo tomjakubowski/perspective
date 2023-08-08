@@ -381,7 +381,6 @@ psp_build_message("${Cyan}Building minimal Apache Arrow${ColorReset}")
 psp_build_dep("rapidjson" "${PSP_CMAKE_MODULE_PATH}/rapidjson.txt.in")
 psp_build_dep("double-conversion" "${PSP_CMAKE_MODULE_PATH}/double-conversion.txt.in")
 psp_build_dep("flatbuffers" "${PSP_CMAKE_MODULE_PATH}/flatbuffers.txt.in")
-
 psp_build_dep("lz4" "${PSP_CMAKE_MODULE_PATH}/lz4.txt.in")
 
 # Build minimal arrow itself
