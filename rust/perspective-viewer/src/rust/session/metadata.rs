@@ -139,7 +139,7 @@ impl SessionMetadata {
     /// # Arguments
     /// - `alias` An alias name for an expression column in this `Session`.
     pub fn get_expression_by_alias(&self, alias: &str) -> Option<String> {
-        maybe!(self.as_ref()?.expr_meta.as_ref()?.alias.get(alias)).cloned()
+        self.as_ref()?.expr_meta.as_ref()?.alias.get(alias).cloned()
     }
 
     /// Returns the edited expression `String` (e.g. the not-yet-saved, edited
@@ -148,31 +148,25 @@ impl SessionMetadata {
     /// # Arguments
     /// - `alias` An alias name for an expression column in this `Session`.
     pub fn get_edit_by_alias(&self, alias: &str) -> Option<String> {
-        maybe!(self
-            .as_ref()?
+        self.as_ref()?
             .expr_meta
             .as_ref()?
             .edited
             .get(alias)
-            .cloned())
+            .cloned()
     }
 
     pub fn set_edit_by_alias(&mut self, alias: &str, edit: String) {
-        drop(maybe!(self
+        maybe!(self
             .as_mut()?
             .expr_meta
             .as_mut()?
             .edited
-            .insert(alias.to_owned(), edit)))
+            .insert(alias.to_owned(), edit));
     }
 
     pub fn clear_edit_by_alias(&mut self, alias: &str) {
-        drop(maybe!(self
-            .as_mut()?
-            .expr_meta
-            .as_mut()?
-            .edited
-            .remove(alias)))
+        maybe!(self.as_mut()?.expr_meta.as_mut()?.edited.remove(alias));
     }
 
     pub fn get_table_columns(&self) -> Option<&'_ Vec<String>> {
@@ -216,13 +210,11 @@ impl SessionMetadata {
     /// - `name` The column name (or expresison alias) to retrieve a principal
     ///   type.
     pub fn get_column_table_type(&self, name: &str) -> Option<Type> {
-        maybe!({
-            let meta = self.as_ref()?;
-            meta.table_schema
-                .get(name)
-                .or_else(|| meta.expr_meta.as_ref()?.schema.get(name))
-                .cloned()
-        })
+        let meta = self.as_ref()?;
+        meta.table_schema
+            .get(name)
+            .or_else(|| meta.expr_meta.as_ref()?.schema.get(name))
+            .cloned()
     }
 
     /// Returns the type of a column name relative to the `View`, including
@@ -235,36 +227,32 @@ impl SessionMetadata {
     /// - `name` The column name (or expresison alias) to retrieve a `View`
     ///   type.
     pub fn get_column_view_type(&self, name: &str) -> Option<Type> {
-        maybe!(self.as_ref()?.view_schema.as_ref()?.get(name)).cloned()
+        self.as_ref()?.view_schema.as_ref()?.get(name).cloned()
     }
 
     pub fn get_column_aggregates<'a>(
         &'a self,
         name: &str,
     ) -> Option<Box<dyn Iterator<Item = Aggregate> + 'a>> {
-        maybe!({
-            let coltype = self.get_column_table_type(name)?;
-            let aggregates = coltype.aggregates_iter();
-            Some(match coltype {
-                Type::Float | Type::Integer => {
-                    let num_cols = self
-                        .get_expression_columns()
-                        .cloned()
-                        .chain(self.get_table_columns()?.clone().into_iter())
-                        .map(move |name| {
-                            self.get_column_table_type(&name)
-                                .map(|coltype| (name, coltype))
-                        })
-                        .collect::<Option<Vec<_>>>()?
-                        .into_iter()
-                        .filter(|(_, coltype)| *coltype == Type::Integer || *coltype == Type::Float)
-                        .map(|(name, _)| {
-                            Aggregate::MultiAggregate(MultiAggregate::WeightedMean, name)
-                        });
-                    Box::new(aggregates.chain(num_cols))
-                }
-                _ => aggregates,
-            })
+        let coltype = self.get_column_table_type(name)?;
+        let aggregates = coltype.aggregates_iter();
+        Some(match coltype {
+            Type::Float | Type::Integer => {
+                let num_cols = self
+                    .get_expression_columns()
+                    .cloned()
+                    .chain(self.get_table_columns()?.clone().into_iter())
+                    .map(move |name| {
+                        self.get_column_table_type(&name)
+                            .map(|coltype| (name, coltype))
+                    })
+                    .collect::<Option<Vec<_>>>()?
+                    .into_iter()
+                    .filter(|(_, coltype)| *coltype == Type::Integer || *coltype == Type::Float)
+                    .map(|(name, _)| Aggregate::MultiAggregate(MultiAggregate::WeightedMean, name));
+                Box::new(aggregates.chain(num_cols))
+            }
+            _ => aggregates,
         })
     }
 }
