@@ -21,6 +21,7 @@ use crate::config::*;
 use crate::dragdrop::*;
 use crate::js::plugin::*;
 use crate::model::*;
+use crate::presentation::Presentation;
 use crate::renderer::*;
 use crate::session::*;
 use crate::utils::ApiFuture;
@@ -34,6 +35,7 @@ pub struct InactiveColumnProps {
     pub dragdrop: DragDrop,
     pub session: Session,
     pub renderer: Renderer,
+    pub presentation: Presentation,
     pub is_editing: bool,
     pub ondragend: Callback<()>,
     pub onselect: Callback<()>,

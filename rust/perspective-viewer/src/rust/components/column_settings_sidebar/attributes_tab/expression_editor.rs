@@ -15,11 +15,13 @@ use std::rc::Rc;
 use wasm_bindgen::JsValue;
 use yew::{function_component, html, Callback, Html, Properties};
 
+use crate::components::column_settings_sidebar::ColumnSettingsTab;
 use crate::components::expression_editor::ExpressionEditor;
 use crate::components::viewer::ColumnLocator;
 use crate::config::{Expression, ViewConfigUpdate};
 use crate::derive_model;
 use crate::model::UpdateAndRender;
+use crate::presentation::{OpenColumnSettings, Presentation};
 use crate::renderer::Renderer;
 use crate::session::Session;
 use crate::utils::ApiFuture;
@@ -32,6 +34,7 @@ pub struct ExprEditorAttrProps {
     pub session: Session,
     pub renderer: Renderer,
     pub on_input: Callback<Rc<String>>,
+    pub presentation: Presentation,
 }
 derive_model!(Renderer, Session for ExprEditorAttrProps);
 
@@ -82,6 +85,12 @@ fn update_expr(alias: String, new_expr_val: &JsValue, props: &ExprEditorAttrProp
         let update = session
             .create_replace_expression_update(&alias, &new_expr)
             .await;
+        props
+            .presentation
+            .set_open_column_settings(Some(OpenColumnSettings {
+                locator: Some(ColumnLocator::Expr(Some(alias.clone()))),
+                tab: Some(ColumnSettingsTab::Attributes),
+            }));
         props.update_and_render(update).await?;
         Ok(())
     });
@@ -97,6 +106,12 @@ fn save_expr(expression: JsValue, props: &ExprEditorAttrProps) {
 
         let mut serde_exprs = props.session.get_view_config().expressions.clone();
         serde_exprs.insert(&expr);
+        props
+            .presentation
+            .set_open_column_settings(Some(OpenColumnSettings {
+                locator: Some(ColumnLocator::Expr(Some(expr.name.clone().into()))),
+                tab: Some(ColumnSettingsTab::Attributes),
+            }));
         props.update_and_render(ViewConfigUpdate {
             expressions: Some(serde_exprs),
             ..Default::default()

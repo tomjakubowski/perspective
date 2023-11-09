@@ -19,9 +19,10 @@ use yew::{function_component, html, Callback, Html, Properties};
 
 use crate::components::viewer::ColumnLocator;
 use crate::custom_events::CustomEvents;
-use crate::html_template;
+use crate::presentation::Presentation;
 use crate::renderer::Renderer;
 use crate::session::Session;
+use crate::{derive_model, html_template};
 
 #[derive(PartialEq, Clone, Properties)]
 pub struct AttributesTabProps {
@@ -30,9 +31,11 @@ pub struct AttributesTabProps {
     pub on_close: Callback<()>,
     pub session: Session,
     pub renderer: Renderer,
+    pub presentation: Presentation,
     pub custom_events: CustomEvents,
     pub on_input: Callback<Rc<String>>,
 }
+derive_model!(Session, Renderer, Presentation for AttributesTabProps);
 
 #[function_component]
 pub fn AttributesTab(p: &AttributesTabProps) -> Html {
@@ -46,6 +49,7 @@ pub fn AttributesTab(p: &AttributesTabProps) -> Html {
                     session={p.session.clone()}
                     renderer={p.renderer.clone()}
                     on_input={p.on_input.clone()}
+                    presentation={p.presentation.clone()}
                 />
             </div>
         </div>

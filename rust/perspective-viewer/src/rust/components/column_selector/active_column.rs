@@ -26,6 +26,7 @@ use crate::custom_elements::ColumnDropDownElement;
 use crate::dragdrop::*;
 use crate::js::plugin::*;
 use crate::model::*;
+use crate::presentation::Presentation;
 use crate::renderer::*;
 use crate::session::*;
 use crate::utils::ApiFuture;
@@ -44,6 +45,7 @@ pub struct ActiveColumnProps {
     pub dragdrop: DragDrop,
     pub session: Session,
     pub renderer: Renderer,
+    pub presentation: Presentation,
     pub column_dropdown: ColumnDropDownElement,
     pub ondragenter: Callback<()>,
     pub ondragend: Callback<()>,
@@ -97,6 +99,15 @@ impl ActiveColumnProps {
             .names
             .as_ref()
             .map_or(0, |x| x.len());
+
+        let open_name = self
+            .presentation
+            .get_open_column_settings()
+            .and_then(|s| s.locator)
+            .and_then(|s| s.name().map(|s| s.to_owned()));
+        if let Some(s) = open_name && s == name {
+            self.presentation.set_open_column_settings(None);
+        }
 
         match self.renderer.metadata().mode {
             ColumnSelectMode::Toggle => {

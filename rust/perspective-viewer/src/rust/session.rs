@@ -180,6 +180,15 @@ impl Session {
         self.borrow().config.is_column_expression_in_use(name)
     }
 
+    pub fn is_column_active(&self, name: &str) -> bool {
+        self.borrow().config.columns.iter().any(|maybe_col| {
+            maybe_col
+                .as_ref()
+                .map(|col| col == name)
+                .unwrap_or_default()
+        })
+    }
+
     pub fn create_drag_drop_update(
         &self,
         column: String,

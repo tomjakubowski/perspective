@@ -39,6 +39,7 @@ pub fn editable_header(p: &EditableHeaderProps) -> Html {
     let noderef = yew::use_node_ref();
     let initial_value = yew::use_state_eq(|| p.value.clone());
     let value_state = yew::use_state_eq(|| ValueState::Unedited);
+    let focused = yew::use_state_eq(|| false);
     let new_value = yew::use_state_eq(|| p.value.clone());
     let set_new_value = yew::use_callback(
         (
@@ -58,8 +59,6 @@ pub fn editable_header(p: &EditableHeaderProps) -> Html {
             on_change.emit(maybe_s);
         },
     );
-
-    let focused = yew::use_state_eq(|| false);
 
     {
         clone!(value_state, new_value);
@@ -87,7 +86,6 @@ pub fn editable_header(p: &EditableHeaderProps) -> Html {
     let onfocus = yew::use_callback(focused.clone(), |_, focused| {
         focused.set(true);
     });
-    // TODO: Autosave on blur?
     let onblur = yew::use_callback(
         (focused.clone(), set_new_value.clone()),
         move |e: FocusEvent, (focused, set_new_value)| {

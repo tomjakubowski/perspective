@@ -133,9 +133,13 @@ impl Component for ExpressionEditor {
                 if self.save_enabled {
                     let expr = self.expr.to_owned();
                     ctx.props().on_save.emit(JsValue::from(&*expr));
+                    self.edit_enabled = false;
+                    self.save_enabled = false;
+                    true
+                } else {
+                    tracing::error!("Tried to save expression when save is disabled!");
+                    false
                 }
-
-                false
             },
             ExpressionEditorMsg::Delete => {
                 if let Some(on_delete) = &ctx.props().on_delete {
