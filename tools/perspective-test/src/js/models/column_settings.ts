@@ -10,7 +10,7 @@
 // ┃ of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). ┃
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-import { Locator } from "@playwright/test";
+import { Locator, expect } from "@playwright/test";
 import { PageView } from "./page";
 
 export class ColumnSettingsSidebar {
@@ -37,7 +37,7 @@ export class ColumnSettingsSidebar {
 
     async openTab(name: string) {
         let locator = this.tabTitle.filter({ hasText: name });
-        await locator.click();
+        await locator.click({ timeout: 1000 });
         await this.container
             .locator(".tab.selected", { hasText: name })
             .waitFor({ timeout: 1000 });

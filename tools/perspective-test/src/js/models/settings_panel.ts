@@ -42,6 +42,7 @@ export class SettingsPanel {
         this.orderbyInput = viewer.locator("#sort input");
         this.whereInput = viewer.locator("#filter input");
     }
+
     /**
      * Creates and saves a new expression column.
      * @param expr
@@ -92,7 +93,7 @@ export class SettingsPanel {
      * @param expr
      */
     async renameExpression(column: ColumnSelector, name: string) {
-        await column.editBtn.click();
+        this.pageView.assureColumnSettingsOpen(column);
         let sidebar = this.pageView.columnSettingsSidebar;
         await sidebar.nameInput.waitFor({
             state: "visible",
@@ -106,7 +107,7 @@ export class SettingsPanel {
     }
 
     async editExpression(column: ColumnSelector, newExpression: string) {
-        await column.editBtn.click();
+        this.pageView.assureColumnSettingsOpen(column);
         let sidebar = this.pageView.columnSettingsSidebar;
         await sidebar.openTab("Attributes");
         let exprEditor = sidebar.attributesTab.expressionEditor;

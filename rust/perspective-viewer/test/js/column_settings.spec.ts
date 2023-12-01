@@ -95,6 +95,7 @@ test.describe("Plugin Styles", () => {
         await exprCol.editBtn.waitFor();
         await rowId.editBtn.waitFor({ state: "detached", timeout: 1000 });
 
+        await view.assureColumnSettingsClosed();
         await exprCol.editBtn.click();
         await checkTab(view.columnSettingsSidebar, false, true);
     });
@@ -110,8 +111,7 @@ test.describe("Plugin Styles", () => {
         let col = activeColumns.getColumnByName("expr");
         await inactiveColumns.container.waitFor({ state: "hidden" });
         await activeColumns.scrollToBottom();
-        await col.editBtn.click();
-        await sidebar.container.waitFor({ state: "visible" });
+        await view.assureColumnSettingsOpen(col);
         await checkTab(sidebar, true, true, true);
         let tabs = await sidebar.tabTitle.all();
         await tabs[1].click();

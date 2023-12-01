@@ -12,7 +12,7 @@
 
 import { Locator, Page, expect } from "@playwright/test";
 import { ColumnSettingsSidebar } from "./column_settings";
-import { ColumnType, SettingsPanel } from "./settings_panel";
+import { ColumnSelector, ColumnType, SettingsPanel } from "./settings_panel";
 import { DataGridPlugin } from "./plugins";
 
 /**
@@ -95,5 +95,23 @@ export class PageView {
             viewer!.toggleConfig(true);
             await viewer!.restore(settings);
         }, settings);
+    }
+
+    async assureColumnSettingsOpen(column: ColumnSelector) {
+        let isEditing = await column.editBtn.evaluate((btn) =>
+            btn.className.includes("is-editing")
+        );
+        if (!isEditing) {
+            this.container.evaluate((_) =>
+                console.log("COLUMN SETTINGS CLOSED")
+            );
+            await column.editBtn.click({ force: true });
+        }
+        expect(this.container).toBeVisible({ timeout: 1000 });
+    }
+    async assureColumnSettingsClosed() {
+        if (await this.columnSettingsSidebar.container.isVisible()) {
+            await this.columnSettingsSidebar.closeBtn.click();
+        }
     }
 }
