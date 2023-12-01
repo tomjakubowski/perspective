@@ -103,8 +103,8 @@ impl ActiveColumnProps {
         let open_name = self
             .presentation
             .get_open_column_settings()
-            .and_then(|s| s.locator)
-            .and_then(|s| s.name().map(|s| s.to_owned()));
+            .locator
+            .and_then(|l| l.name().map(|n| n.to_owned()));
         if let Some(s) = open_name && s == name {
             self.presentation.set_open_column_settings(None);
         }

@@ -144,9 +144,7 @@ impl Component for PerspectiveViewer {
                 if update {
                     vec![PerspectiveViewerMsg::RenderLimits(Some(x))]
                 } else {
-                    let locator = presentation
-                        .get_open_column_settings()
-                        .and_then(|s| s.locator);
+                    let locator = presentation.get_open_column_settings().locator;
                     let is_active = locator
                         .as_ref()
                         .map(|l| l.is_active(&session))
@@ -282,6 +280,7 @@ impl Component for PerspectiveViewer {
                     self.selected_column = locator.clone();
 
                     locator
+                        .clone()
                         .map(|c| match c {
                             ColumnLocator::Plain(s) => (true, Some(s)),
                             ColumnLocator::Expr(maybe_s) => (true, maybe_s),
@@ -289,15 +288,11 @@ impl Component for PerspectiveViewer {
                         .unwrap_or_default()
                 };
 
-                ctx.props().presentation.set_open_column_settings(
-                    ctx.props()
-                        .presentation
-                        .get_open_column_settings()
-                        .map(|mut s| {
-                            s.locator = self.selected_column.clone();
-                            s
-                        }),
-                );
+                let mut open_column_settings = ctx.props().presentation.get_open_column_settings();
+                open_column_settings.locator = self.selected_column.clone();
+                ctx.props()
+                    .presentation
+                    .set_open_column_settings(Some(open_column_settings));
 
                 if let Some(sender) = sender {
                     sender.send(()).unwrap();

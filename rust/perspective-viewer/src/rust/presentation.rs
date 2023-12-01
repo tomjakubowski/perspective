@@ -47,7 +47,7 @@ impl Deref for Presentation {
 
 impl ImplicitClone for Presentation {}
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct OpenColumnSettings {
     pub locator: Option<ColumnLocator>,
     pub tab: Option<ColumnSettingsTab>,
@@ -66,7 +66,7 @@ pub struct PresentationHandle {
     theme_data: Mutex<ThemeData>,
     name: RefCell<Option<String>>,
     is_settings_open: RefCell<bool>,
-    open_column_settings: RefCell<Option<OpenColumnSettings>>,
+    open_column_settings: RefCell<OpenColumnSettings>,
     is_workspace: RefCell<Option<bool>>,
     pub settings_open_changed: PubSub<bool>,
     pub column_settings_open_changed: PubSub<(bool, Option<String>)>,
@@ -145,17 +145,19 @@ impl Presentation {
     }
 
     /// Sets the currently opened column settings. Emits an internal event on
-    /// change.
+    /// change. Passing None is a shorthand for setting all fields to
+    /// None.
     pub fn set_open_column_settings(&self, settings: Option<OpenColumnSettings>) {
+        let settings = settings.unwrap_or_default();
         if *(self.open_column_settings.borrow()) != settings {
             *(self.open_column_settings.borrow_mut()) = settings.to_owned();
             self.column_settings_open_changed
-                .emit_all((true, settings.and_then(|s| s.name())));
+                .emit_all((true, settings.name()));
         }
     }
 
     /// Gets a clone of the current OpenColumnSettings.
-    pub fn get_open_column_settings(&self) -> Option<OpenColumnSettings> {
+    pub fn get_open_column_settings(&self) -> OpenColumnSettings {
         self.open_column_settings.borrow().deref().clone()
     }
 
