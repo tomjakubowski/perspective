@@ -186,12 +186,6 @@ impl Component for InactiveColumn {
             class.push("dragdrop-hover");
         }
 
-        let icon_type = if is_expression {
-            TypeIconType::Expr
-        } else {
-            TypeIconType::Type(col_type)
-        };
-
         html! {
             <div
                 class={ class }
@@ -211,7 +205,7 @@ impl Component for InactiveColumn {
                     { ondragend }>
 
                     <div class="column-selector-column-border">
-                        <TypeIcon ty={icon_type} />
+                        <TypeIcon ty={col_type} />
                         <span class={"column_name"}>
                             { ctx.props().name.clone() }
                         </span>
