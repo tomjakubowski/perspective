@@ -55,7 +55,7 @@ impl ExpressionEditorProps {
 /// Expression editor component `CodeEditor` and a button toolbar.
 pub struct ExpressionEditor {
     save_enabled: bool,
-    edit_enabled: bool,
+    reset_enabled: bool,
     expr: Rc<String>,
     error: Option<PerspectiveValidationError>,
 }
@@ -67,7 +67,7 @@ impl Component for ExpressionEditor {
     fn create(ctx: &Context<Self>) -> Self {
         Self {
             save_enabled: false,
-            edit_enabled: false,
+            reset_enabled: false,
             error: None,
             expr: ctx.props().initial_expr(),
         }
@@ -77,6 +77,7 @@ impl Component for ExpressionEditor {
         match msg {
             ExpressionEditorMsg::SetExpr(val) => {
                 ctx.props().on_input.emit(val.clone());
+                self.reset_enabled = ctx.props().initial_expr() != val;
                 self.expr = val.clone();
                 clone!(ctx.props().session);
                 ctx.props().on_validate.emit(true);
@@ -106,7 +107,6 @@ impl Component for ExpressionEditor {
                         Some(is_edited)
                     });
 
-                    self.edit_enabled = is_edited.unwrap_or_default();
                     self.save_enabled = is_edited.unwrap_or(true);
                 } else {
                     self.save_enabled = false;
@@ -116,24 +116,18 @@ impl Component for ExpressionEditor {
                 true
             },
             ExpressionEditorMsg::Reset => {
-                self.edit_enabled = false;
+                self.reset_enabled = false;
                 self.save_enabled = false;
-                maybe!({
-                    let alias = ctx.props().alias.as_ref()?;
-                    let session = &ctx.props().session;
-                    let old = session.metadata().get_expression_by_alias(alias)?;
-                    self.expr = old.into();
-                    Some(())
-                })
-                .unwrap_or_default();
-
+                self.expr = ctx.props().initial_expr();
+                ctx.link()
+                    .send_message(ExpressionEditorMsg::SetExpr(self.expr.clone()));
                 true
             },
             ExpressionEditorMsg::SaveExpr => {
                 if self.save_enabled {
                     let expr = self.expr.to_owned();
                     ctx.props().on_save.emit(JsValue::from(&*expr));
-                    self.edit_enabled = false;
+                    self.reset_enabled = false;
                     self.save_enabled = false;
                     true
                 } else {
@@ -172,53 +166,55 @@ impl Component for ExpressionEditor {
             <LocalStyle href={ css!("expression-editor") } />
             <SplitPanel orientation={ Orientation::Vertical }>
                 <>
-                    <div>
-                        <label class="item_title">{ "Expression" }</label>
-                        <div id="editor-container" class={ disabled_class }>
-                            <CodeEditor
-                                expr={ &self.expr }
-                                error={ self.error.clone().map(|x| x.into()) }
-                                { disabled }
-                                { oninput }
-                                { onsave }/>
+                    <label class="item_title">{ "Expression" }</label>
+                    <div id="editor-container" class={ disabled_class }>
+                        <CodeEditor
+                            expr={ &self.expr }
+                            error={ self.error.clone().map(|x| x.into()) }
+                            { disabled }
+                            { oninput }
+                            { onsave }/>
 
-                            <div id="psp-expression-editor-meta">
-                                <div class="error">
-                                    {&self.error.clone().map(|e| e.error_message).unwrap_or_default()}
-                                </div>
-
-                                <div id="psp-expression-editor-actions">
-                                    <button
-                                        id="psp-expression-editor-button-delete"
-                                        class="psp-expression-editor__button"
-                                        style = {delete_hidden.then_some("visibility: hidden")}
-                                        onmousedown={ delete }>
-                                        { "Delete" }
-                                    </button>
-
-                                    <button
-                                        id="psp-expression-editor-button-reset"
-                                        class="psp-expression-editor__button"
-                                        style = {ctx.props().alias.is_none().then_some("visibility: hidden")}
-                                        onmousedown={ reset }
-                                        disabled={ !self.edit_enabled }>
-                                        { "Reset" }
-                                    </button>
-
-                                    <button
-                                        id="psp-expression-editor-button-save"
-                                        class="psp-expression-editor__button"
-                                        onmousedown={ save }
-                                        disabled={ !self.save_enabled }>
-                                        { "Save" }
-                                    </button>
-                                </div>
+                        <div id="psp-expression-editor-meta">
+                            <div class="error">
+                                {&self.error.clone().map(|e| e.error_message).unwrap_or_default()}
                             </div>
                         </div>
                     </div>
                 </>
                 <></>
             </SplitPanel>
+
+            // TODO: This should be its own component.
+            if !delete_hidden {
+                <div id="danger-zone">
+                    <button
+                        id="psp-expression-editor-button-delete"
+                        class="psp-expression-editor__button"
+                        onmousedown={ delete }>
+                        { "Delete Column" }
+                    </button>
+                </div>
+            }
+
+            // TODO: This should be its own component.
+            <div id="save-settings">
+                <button
+                    id="psp-expression-editor-button-reset"
+                    class="psp-expression-editor__button"
+                    onmousedown={ reset }
+                    disabled={ !self.reset_enabled }>
+                    { "Reset" }
+                </button>
+
+                <button
+                    id="psp-expression-editor-button-save"
+                    class="psp-expression-editor__button"
+                    onmousedown={ save }
+                    disabled={ !self.save_enabled }>
+                    { "Save" }
+                </button>
+            </div>
         }
     }
 
