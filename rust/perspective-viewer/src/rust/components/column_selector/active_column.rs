@@ -19,7 +19,7 @@ use super::aggregate_selector::*;
 use super::expression_toolbar::*;
 use super::InPlaceColumn;
 use crate::components::column_selector::{EmptyColumn, InvalidColumn};
-use crate::components::type_icon::{TypeIcon, TypeIconType};
+use crate::components::type_icon::TypeIcon;
 use crate::components::viewer::ColumnLocator;
 use crate::config::*;
 use crate::custom_elements::ColumnDropDownElement;
@@ -419,6 +419,10 @@ impl Component for ActiveColumn {
                                 <span class={"column_name"}>
                                     { name.clone() }
                                 </span>
+
+                                if !ctx.props().is_aggregated {
+                                    <span class="column-selector--spacer"></span>
+                                }
 
                                 if show_edit_btn {
                                     <ExprEditButton
