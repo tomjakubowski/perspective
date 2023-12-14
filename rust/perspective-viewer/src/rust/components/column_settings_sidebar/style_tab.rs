@@ -27,7 +27,7 @@ pub struct StyleTabProps {
     pub session: Session,
     pub renderer: Renderer,
 
-    pub ty: Type,
+    pub ty: Option<Type>,
     pub column_name: String,
 }
 
@@ -40,7 +40,7 @@ pub fn StyleTab(p: &StyleTabProps) -> Html {
                     custom_events={ p.custom_events.clone() }
                     session={ p.session.clone() }
                     renderer={ p.renderer.clone() }
-                    ty={ p.ty }
+                    ty={ p.ty.unwrap() }
                     column_name={ p.column_name.clone() }/>
             </div>
         </div>

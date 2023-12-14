@@ -1,12 +1,10 @@
-use std::rc::Rc;
-
 use yew::{function_component, html, Callback, Html, Properties};
 
-use crate::components::column_settings_sidebar::attributes_tab::AttributesTab;
-use crate::components::column_settings_sidebar::style_tab::StyleTab;
+use crate::components::column_settings_sidebar::attributes_tab::{
+    AttributesTab, AttributesTabProps,
+};
+use crate::components::column_settings_sidebar::style_tab::{StyleTab, StyleTabProps};
 use crate::components::containers::tablist::TabList;
-use crate::components::viewer::ColumnLocator;
-use crate::config::Type;
 use crate::custom_events::CustomEvents;
 use crate::presentation::Presentation;
 use crate::renderer::Renderer;
@@ -25,26 +23,18 @@ pub struct ColumnSettingsTablistProps {
     pub presentation: Presentation,
     pub session: Session,
     pub custom_events: CustomEvents,
-    pub on_close: Callback<()>,
-    pub selected_column: ColumnLocator,
-    pub on_expr_input: Callback<Rc<String>>,
+
+    pub attrs_tab: AttributesTabProps,
+    pub style_tab: StyleTabProps,
+
     pub on_tab_change: Callback<(usize, ColumnSettingsTab)>,
     pub selected_tab: (usize, ColumnSettingsTab),
     pub tabs: Vec<ColumnSettingsTab>,
-    pub maybe_ty: Option<Type>,
-    pub header_value: Option<String>,
-    pub column_name: String,
-    pub is_active: bool,
 }
 
 impl PartialEq for ColumnSettingsTablistProps {
     fn eq(&self, other: &Self) -> bool {
-        self.selected_column == other.selected_column
-            && self.column_name == other.column_name
-            && self.selected_tab == other.selected_tab
-            && self.tabs == other.tabs
-            && self.is_active == other.is_active
-            && self.header_value == other.header_value
+        self.selected_tab == other.selected_tab && self.tabs == other.tabs
     }
 }
 
@@ -53,28 +43,11 @@ pub fn column_settings_tablist(p: &ColumnSettingsTablistProps) -> Html {
     let match_fn = yew::use_callback(p.clone(), move |tab, p| match tab {
         ColumnSettingsTab::Attributes => {
             html! {
-                <AttributesTab
-                    session={ p.session.clone() }
-                    renderer={ p.renderer.clone() }
-                    custom_events={ p.custom_events.clone() }
-                    presentation={ p.presentation.clone() }
-
-                    selected_column={ p.selected_column.clone() }
-                    on_close={ p.on_close.clone() }
-                    header_value={p.header_value.clone()}
-                    on_input={p.on_expr_input.clone()}
-                />
+                <AttributesTab ..p.attrs_tab.clone() />
             }
         },
         ColumnSettingsTab::Style => html! {
-            <StyleTab
-                session={ p.session.clone() }
-                renderer={ p.renderer.clone() }
-                custom_events={ p.custom_events.clone() }
-
-                column_name={ p.column_name.clone() }
-                ty={ p.maybe_ty.unwrap() }
-            />
+            <StyleTab ..p.style_tab.clone() />
         },
     });
 

@@ -19,6 +19,8 @@ use std::rc::Rc;
 pub use tablist::*;
 use yew::{function_component, html, Callback, Html, Properties};
 
+use crate::components::column_settings_sidebar::attributes_tab::AttributesTabProps;
+use crate::components::column_settings_sidebar::style_tab::StyleTabProps;
 use crate::components::containers::sidebar::Sidebar;
 use crate::components::containers::tablist::Tab;
 use crate::components::style::LocalStyle;
@@ -62,17 +64,28 @@ impl PartialEq for ColumnSettingsProps {
 #[function_component]
 pub fn ColumnSettingsSidebar(p: &ColumnSettingsProps) -> Html {
     let column_name = p.selected_column.name_or_default(&p.session);
-    let header_value = yew::use_state_eq(|| Some(column_name.clone()));
+    let expr_value = p.session.metadata().get_expression_by_alias(&column_name);
+    let header_value_opt =
+        expr_value.and_then(|val| (val != column_name).then_some(column_name.clone()));
+    let header_value = yew::use_state_eq(|| header_value_opt.clone());
+    let initial_header_value = yew::use_state_eq(|| header_value_opt);
+    let header_valid = yew::use_state_eq(|| true);
     {
         // on p.selected_column change...
-        clone!(header_value, p.session);
+        clone!(header_value, initial_header_value, p.session);
         yew::use_effect_with(p.selected_column.clone(), move |selected_column| {
-            header_value.set(Some(selected_column.name_or_default(&session)));
+            let value = Some(selected_column.name_or_default(&session));
+            header_value.set(value.clone());
+            initial_header_value.set(value);
         });
     }
-    let on_change_header_value = yew::use_callback(header_value.clone(), |s, header_value| {
-        header_value.set(s);
-    });
+    let on_change_header_value = yew::use_callback(
+        (header_value.clone(), header_valid.clone()),
+        |(value, valid), (header_value, header_valid)| {
+            header_value.set(value);
+            header_valid.set(valid);
+        },
+    );
 
     let expr_contents = {
         let expr_contents = p
@@ -84,6 +97,9 @@ pub fn ColumnSettingsSidebar(p: &ColumnSettingsProps) -> Html {
     };
     let on_expr_input = yew::use_callback(expr_contents.clone(), |val, expr_contents| {
         expr_contents.set(val)
+    });
+    let on_expr_reset = yew::use_callback((), |(), ()| {
+        todo!();
     });
 
     let maybe_ty = p.session.metadata().get_column_view_type(&column_name);
@@ -125,18 +141,38 @@ pub fn ColumnSettingsSidebar(p: &ColumnSettingsProps) -> Html {
     let header_contents = html! {
         <ColumnSettingsHeader
             {maybe_ty}
-            header_value={(*header_value).clone()}
+            initial_value={(*initial_header_value).clone()}
             on_change={on_change_header_value.clone()}
             selected_tab={selected_tab.1}
             selected_column={p.selected_column.clone()}
             placeholder={(*expr_contents).clone()}
             session={p.session.clone()}
-            renderer={p.renderer.clone()}
-            presentation={p.presentation.clone()}
         />
     };
 
     // --- render ---
+    let attrs_tab = AttributesTabProps {
+        header_value: (*header_value).clone(),
+        initial_header_value: (*initial_header_value).clone(),
+        header_valid: *header_valid,
+        selected_column: (p.selected_column.clone()),
+        on_close: p.on_close.clone(),
+        on_reset: on_expr_reset,
+        session: p.session.clone(),
+        renderer: p.renderer.clone(),
+        presentation: p.presentation.clone(),
+        custom_events: p.custom_events.clone(),
+        on_input: on_expr_input,
+    };
+
+    let style_tab = StyleTabProps {
+        custom_events: p.custom_events.clone(),
+        session: p.session.clone(),
+        renderer: p.renderer.clone(),
+        ty: maybe_ty,
+        column_name,
+    };
+
     html_template! {
         <LocalStyle href={ css!("column-settings-panel") } />
         <Sidebar
@@ -152,17 +188,12 @@ pub fn ColumnSettingsSidebar(p: &ColumnSettingsProps) -> Html {
                 session={p.session.clone()}
                 custom_events={p.custom_events.clone()}
 
-                on_close={p.on_close.clone()}
-                selected_column={p.selected_column.clone()}
-                {on_expr_input}
-
                 on_tab_change={on_tab_change.clone()}
                 selected_tab={*selected_tab}
                 {tabs}
-                {maybe_ty}
-                header_value={(*header_value).clone()}
-                {column_name}
-                is_active={p.is_active}
+
+                {attrs_tab}
+                {style_tab}
             />
 
         </Sidebar>

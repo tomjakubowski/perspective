@@ -12,19 +12,25 @@
 
 use std::rc::Rc;
 
+use derivative::Derivative;
+use itertools::Itertools;
 use web_sys::{FocusEvent, HtmlInputElement, KeyboardEvent};
 use yew::{classes, function_component, html, Callback, Html, Properties, TargetCast};
 
 use crate::clone;
+use crate::session::Session;
 
-#[derive(PartialEq, Debug, Properties)]
+#[derive(PartialEq, Properties, Derivative)]
+#[derivative(Debug)]
 pub struct EditableHeaderProps {
     pub icon: Option<Html>,
-    pub on_change: Callback<Option<String>>,
-    pub on_submit: Callback<Option<String>>,
+    pub on_change: Callback<(Option<String>, bool)>,
     pub editable: bool,
-    pub value: Option<String>,
+    pub initial_value: Option<String>,
     pub placeholder: Rc<String>,
+
+    #[derivative(Debug = "ignore")]
+    pub session: Session,
 }
 
 #[derive(Default, Debug, PartialEq, Copy, Clone)]
@@ -37,72 +43,74 @@ pub enum ValueState {
 #[function_component(EditableHeader)]
 pub fn editable_header(p: &EditableHeaderProps) -> Html {
     let noderef = yew::use_node_ref();
-    let initial_value = yew::use_state_eq(|| p.value.clone());
     let value_state = yew::use_state_eq(|| ValueState::Unedited);
-    let focused = yew::use_state_eq(|| false);
-    let new_value = yew::use_state_eq(|| p.value.clone());
+    let valid = yew::use_state_eq(|| true);
+    let new_value = yew::use_state_eq(|| p.initial_value.clone());
     let set_new_value = yew::use_callback(
         (
             new_value.clone(),
             p.on_change.clone(),
-            initial_value.clone(),
+            p.initial_value.clone(),
             value_state.clone(),
+            valid.clone(),
+            p.session.clone(),
         ),
-        |s: String, (new_value, on_change, initial_value, value_state)| {
+        |s: String, (new_value, on_change, initial_value, value_state, valid, session)| {
             let maybe_s = (!s.is_empty()).then_some(s);
-            if maybe_s == **initial_value {
+            if maybe_s == *initial_value {
                 value_state.set(ValueState::Unedited);
             } else {
                 value_state.set(ValueState::Edited);
             }
+
+            let title_is_valid = maybe_s
+                .as_ref()
+                .and_then(|s| {
+                    let metadata = session.metadata();
+                    let expressions = metadata.get_expression_columns();
+                    let found = metadata
+                        .get_table_columns()?
+                        .iter()
+                        .chain(expressions)
+                        .contains(s);
+                    Some(!found)
+                })
+                .unwrap_or(true);
+
+            valid.set(title_is_valid);
             new_value.set(maybe_s.clone());
-            on_change.emit(maybe_s);
+            on_change.emit((maybe_s, title_is_valid));
         },
     );
 
     {
         clone!(value_state, new_value);
-        yew::use_effect_with((p.editable, p.value.clone()), move |(editable, value)| {
-            if !editable {
-                value_state.set(ValueState::Unedited);
-            }
-            new_value.set(value.to_owned());
-        });
+        yew::use_effect_with(
+            (p.editable, p.initial_value.clone()),
+            move |(editable, value)| {
+                if !editable {
+                    value_state.set(ValueState::Unedited);
+                }
+                new_value.set(value.to_owned());
+            },
+        );
     }
-
-    let on_submit = {
-        clone!(value_state, initial_value);
-        p.on_submit.reform(move |target_value: String| {
-            let new_value = (!target_value.is_empty()).then_some(target_value);
-            initial_value.set(new_value.clone());
-            value_state.set(ValueState::Unedited);
-            new_value
-        })
-    };
 
     let onclick = yew::use_callback(noderef.clone(), |_, noderef| {
         noderef.cast::<HtmlInputElement>().unwrap().focus().unwrap();
     });
-    let onfocus = yew::use_callback(focused.clone(), |_, focused| {
-        focused.set(true);
-    });
     let onblur = yew::use_callback(
-        (focused.clone(), set_new_value.clone()),
-        move |e: FocusEvent, (focused, set_new_value)| {
+        set_new_value.clone(),
+        move |e: FocusEvent, set_new_value| {
             let value = e.target_unchecked_into::<HtmlInputElement>().value();
-            set_new_value.emit(value.trim().to_owned());
-            focused.set(false);
+            set_new_value.emit(value);
         },
     );
     let onkeyup = yew::use_callback(
-        (on_submit.clone(), set_new_value.clone()),
-        move |e: KeyboardEvent, (on_submit, set_new_value)| {
-            let target = e.target_unchecked_into::<HtmlInputElement>();
-            let target_value = target.value().trim().to_owned();
-            set_new_value.emit(target_value.clone());
-            if let "Enter" = &*e.key() {
-                on_submit.emit(target_value);
-            }
+        set_new_value.clone(),
+        move |e: KeyboardEvent, set_new_value| {
+            let value = e.target_unchecked_into::<HtmlInputElement>().value();
+            set_new_value.emit(value);
         },
     );
 
@@ -110,12 +118,12 @@ pub fn editable_header(p: &EditableHeaderProps) -> Html {
     if p.editable {
         classes.push("editable");
     }
+    if !*valid {
+        classes.push("invalid");
+    }
     match *value_state {
         ValueState::Unedited => {},
         ValueState::Edited => classes.push("edited"),
-    }
-    if *focused {
-        classes.push("focused");
     }
     let split = p
         .placeholder
@@ -142,7 +150,6 @@ pub fn editable_header(p: &EditableHeaderProps) -> Html {
                 disabled={!p.editable}
                 {onblur}
                 {onkeyup}
-                {onfocus}
                 value={(*new_value).clone()}
                 {placeholder}
             />

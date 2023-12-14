@@ -27,8 +27,11 @@ use crate::{derive_model, html_template};
 #[derive(PartialEq, Clone, Properties)]
 pub struct AttributesTabProps {
     pub header_value: Option<String>,
+    pub initial_header_value: Option<String>,
+    pub header_valid: bool,
     pub selected_column: ColumnLocator,
     pub on_close: Callback<()>,
+    pub on_reset: Callback<()>,
     pub session: Session,
     pub renderer: Renderer,
     pub presentation: Presentation,
@@ -44,7 +47,10 @@ pub fn AttributesTab(p: &AttributesTabProps) -> Html {
             <div class="tab-section">
                 <ExprEditorAttr
                     on_close={p.on_close.clone()}
+                    on_reset={p.on_reset.clone()}
                     header_value={p.header_value.clone()}
+                    header_valid={p.header_valid}
+                    header_changed={p.header_value != p.initial_header_value}
                     selected_column={p.selected_column.clone()}
                     session={p.session.clone()}
                     renderer={p.renderer.clone()}

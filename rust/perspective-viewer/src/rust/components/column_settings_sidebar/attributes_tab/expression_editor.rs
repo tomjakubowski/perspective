@@ -29,8 +29,11 @@ use crate::utils::ApiFuture;
 #[derive(Properties, PartialEq, Clone)]
 pub struct ExprEditorAttrProps {
     pub header_value: Option<String>,
+    pub header_valid: bool,
+    pub header_changed: bool,
     pub selected_column: ColumnLocator,
     pub on_close: Callback<()>,
+    pub on_reset: Callback<()>,
     pub session: Session,
     pub renderer: Renderer,
     pub on_input: Callback<Rc<String>>,
@@ -66,29 +69,34 @@ pub fn expression_editor_attr(p: &ExprEditorAttrProps) -> Html {
                 { on_save }
                 { on_validate }
                 { on_delete }
+                on_reset = { p.on_reset.clone() }
                 on_input={ p.on_input.clone() }
                 session = { &p.session }
                 alias = { p.selected_column.name().cloned() }
                 disabled = {!matches!(p.selected_column, ColumnLocator::Expr(_))}
+                valid_alias = {p.header_valid}
+                alias_changed = {p.header_changed}
             />
         </div>
     }
 }
 
-fn update_expr(alias: String, new_expr_val: &JsValue, props: &ExprEditorAttrProps) {
+fn update_expr(old_name: String, new_expr_val: &JsValue, props: &ExprEditorAttrProps) {
     let session = props.session.clone();
     let props = props.clone();
+
     let new_expr_val = new_expr_val.as_string().unwrap();
-    let new_expr = Expression::new(Some(alias.clone().into()), new_expr_val.into());
+    let new_name = props.header_value.clone().unwrap_or(new_expr_val.clone());
+    let new_expr = Expression::new(Some(new_name.into()), new_expr_val.into());
 
     ApiFuture::spawn(async move {
         let update = session
-            .create_replace_expression_update(&alias, &new_expr)
+            .create_replace_expression_update(&old_name, &new_expr)
             .await;
         props
             .presentation
             .set_open_column_settings(Some(OpenColumnSettings {
-                locator: Some(ColumnLocator::Expr(Some(alias.clone()))),
+                locator: Some(ColumnLocator::Expr(Some(old_name.clone()))),
                 tab: Some(ColumnSettingsTab::Attributes),
             }));
         props.update_and_render(update).await?;

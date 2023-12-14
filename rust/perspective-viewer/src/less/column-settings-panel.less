@@ -62,12 +62,15 @@
                 cursor: text;
             }
         }
-        &.focused {
+        &::focus {
             outline-style: solid;
             background: var(--plugin--background);
         }
         &.edited {
             outline-style: dashed;
+        }
+        &.invalid {
+            outline-color: var(--error--color);
         }
 
         .sidebar_header_title {

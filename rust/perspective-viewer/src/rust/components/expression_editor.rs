@@ -38,8 +38,11 @@ pub struct ExpressionEditorProps {
     pub on_validate: Callback<bool>,
     pub on_delete: Option<Callback<()>>,
     pub on_input: Callback<Rc<String>>,
+    pub on_reset: Callback<()>,
     pub alias: Option<String>,
     pub disabled: bool,
+    pub valid_alias: bool,
+    pub alias_changed: bool,
 }
 
 impl ExpressionEditorProps {
@@ -107,7 +110,7 @@ impl Component for ExpressionEditor {
                         Some(is_edited)
                     });
 
-                    self.save_enabled = is_edited.unwrap_or(true);
+                    self.save_enabled = is_edited.unwrap_or(true) && ctx.props().valid_alias;
                 } else {
                     self.save_enabled = false;
                 }
@@ -119,6 +122,7 @@ impl Component for ExpressionEditor {
                 self.reset_enabled = false;
                 self.save_enabled = false;
                 self.expr = ctx.props().initial_expr();
+                ctx.props().on_reset.emit(());
                 ctx.link()
                     .send_message(ExpressionEditorMsg::SetExpr(self.expr.clone()));
                 true
