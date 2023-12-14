@@ -29,7 +29,7 @@ pub enum ColumnSettingsTab {
     Style,
 }
 
-#[derive(Clone, Properties)]
+#[derive(Clone, Properties, PartialEq)]
 pub struct ColumnSettingsTablistProps {
     pub renderer: Renderer,
     pub presentation: Presentation,
@@ -44,11 +44,12 @@ pub struct ColumnSettingsTablistProps {
     pub tabs: Vec<ColumnSettingsTab>,
 }
 
-impl PartialEq for ColumnSettingsTablistProps {
-    fn eq(&self, other: &Self) -> bool {
-        self.selected_tab == other.selected_tab && self.tabs == other.tabs
-    }
-}
+// DO Not commit!!!1!
+// impl PartialEq for ColumnSettingsTablistProps {
+//     fn eq(&self, other: &Self) -> bool {
+//         self.selected_tab == other.selected_tab && self.tabs == other.tabs
+//     }
+// }
 
 #[function_component(ColumnSettingsTablist)]
 pub fn column_settings_tablist(p: &ColumnSettingsTablistProps) -> Html {

@@ -77,6 +77,8 @@ impl Component for ExpressionEditor {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        tracing::info!("<ExpressionEditor> update, msg = {:#?}", msg);
+
         match msg {
             ExpressionEditorMsg::SetExpr(val) => {
                 ctx.props().on_input.emit(val.clone());
@@ -223,9 +225,17 @@ impl Component for ExpressionEditor {
     }
 
     fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
+        let alias_changed = ctx.props().alias_changed;
+        tracing::info!("<ExpressionEditor>::changed {}", alias_changed);
         if ctx.props().alias != old_props.alias {
+            // Selected column has changed
             self.expr = ctx.props().initial_expr();
         }
+        if alias_changed && ctx.props().valid_alias {
+            self.save_enabled = true;
+        }
+        // TODO: handle disable save when alias goes back to original value
+
         true
     }
 }

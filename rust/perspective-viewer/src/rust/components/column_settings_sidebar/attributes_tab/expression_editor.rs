@@ -63,6 +63,9 @@ pub fn expression_editor_attr(p: &ExprEditorAttrProps) -> Html {
         p.on_close.emit(());
     });
 
+    tracing::warn!("header valid? {}", p.header_valid);
+    tracing::warn!("header changed? {}", p.header_changed);
+
     html! {
         <div id ="attributes-expr">
             <ExpressionEditor

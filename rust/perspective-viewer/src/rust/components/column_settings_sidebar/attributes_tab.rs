@@ -42,6 +42,11 @@ derive_model!(Session, Renderer, Presentation for AttributesTabProps);
 
 #[function_component]
 pub fn AttributesTab(p: &AttributesTabProps) -> Html {
+    tracing::info!(
+        "<AttributesTab> header_value {:?} (initial {:?})",
+        p.header_value,
+        p.initial_header_value
+    );
     html_template! {
         <div id="attributes-tab">
             <div class="tab-section">
