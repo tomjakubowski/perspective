@@ -192,8 +192,9 @@ declare module "@finos/perspective" {
         PERSPECTIVE_READY = "perspective-ready",
     }
 
-    export type PerspectiveWorker = Worker & {
+    export type PerspectiveWorker = {
         table(data: TableData | View, options?: TableOptions): Promise<Table>;
+        _worker: Worker;
     };
 
     export class WebSocketClient {
