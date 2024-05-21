@@ -1096,7 +1096,7 @@ jobs:
               with:
                   name: perspective-python-sdist
                   path: python/perspective/dist/*.tar.gz
-              if: ${{ matrix.os == 'macos-11' }}
+              if: ${{ matrix.os == 'macos-11' && matrix.python-version == 3.8 }}
 
     build_pyodide:
         strategy:
@@ -1661,7 +1661,7 @@ jobs:
             ################
             # Python
             - name: Install python dependencies
-              run: pnpm rin _requires_python
+              run: pnpm run _requires_python
 
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
             #~~~~~~~~~ Build Pipelines ~~~~~~~~~#
