@@ -22,5 +22,5 @@ path = "main.rs"
 bench = false
 
 [dependencies]
-wasm-bindgen-cli-support = "0.2.87"
+wasm-bindgen-cli-support = "=0.2.91"
 wasm-opt = "0.116.0"
