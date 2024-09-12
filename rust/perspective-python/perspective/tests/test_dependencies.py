@@ -11,38 +11,33 @@
 #  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-import perspective as psp
+# test that loading perspective and calling a common constructor code path does
+# not load various "expensive" modules. "Expensive" is in quotes because this is
+# utter nonsense.
+def test_lazy_modules():
+    import sys
 
-server = psp.Server()
-client = server.new_local_client()
-Table = client.table
+    cache = {}
+    for key in list(sys.modules.keys()):
+        if (
+            key.startswith("perspective")
+            or key.startswith("test")
+            or key.startswith("pandas")
+            or key.startswith("pyarrow")
+            or key.startswith("tornado")
+        ):
+            cache[key] = sys.modules[key]
+            del sys.modules[key]
 
+    import perspective
 
-def compare_delta(received, expected):
-    """Compare an arrow-serialized row delta by constructing a Table."""
-    tbl = Table(received)
-    assert tbl.view().to_columns() == expected
+    t1 = perspective.table("x\n1")
+    t1.delete()
 
+    assert "perspective" in sys.modules
+    assert "pandas" not in sys.modules
+    assert "pyarrow" not in sys.modules
+    assert "tornado" not in sys.modules
 
-class TestThreadpool(object):
-    def test_set_threadpool_size(self):
-        server.set_threadpool_size(1)  # XXX: This is a no-op now...
-        data = [{"a": 1, "b": 2}, {"a": 3, "b": 4}]
-        tbl = Table(data)
-        view = tbl.view()
-        dims = view.dimensions()
-        assert dims["num_view_rows"] == 2
-        assert dims["num_view_columns"] == 2
-        assert view.schema() == {"a": "integer", "b": "integer"}
-        assert view.to_records() == data
-
-    def test_set_threadpool_size_max(self):
-        server.set_threadpool_size(None)
-        data = [{"a": 1, "b": 2}, {"a": 3, "b": 4}]
-        tbl = Table(data)
-        view = tbl.view()
-        dims = view.dimensions()
-        assert dims["num_view_rows"] == 2
-        assert dims["num_view_columns"] == 2
-        assert view.schema() == {"a": "integer", "b": "integer"}
-        assert view.to_records() == data
+    for k, v in cache.items():
+        sys.modules[k] = v
