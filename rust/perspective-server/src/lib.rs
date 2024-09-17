@@ -19,5 +19,6 @@ mod local_client;
 mod local_session;
 mod server;
 
+pub use local_client::LocalClient;
 pub use local_session::LocalSession;
 pub use server::{Server, ServerError, SessionHandler};
