@@ -75,8 +75,13 @@ if (build_wheel) {
         process.env.PSP_ARCH === "x86_64" &&
         process.platform === "linux"
     ) {
-        target =
-            "--target=x86_64-unknown-linux-gnu --compatibility manylinux_2_28";
+        const triple = "x86_64-unknown-linux-gnu";
+        if (process.env.CONDA_BUILD === "1") {
+            target = `--target=${triple} --manylinux off`
+        } else {
+            target =
+                `--target=${triple} --compatibility manylinux_2_28`;
+        }
     } else if (
         process.env.PSP_ARCH === "aarch64" &&
         process.platform === "linux"
@@ -100,7 +105,7 @@ if (build_wheel) {
         }
         // we need to generate proto.rs using conda's protoc, which is set in
         // the environment.  we use the unstable "versioned" python abi
-        features.push(["generate-proto"]);
+        features.push(["generate-proto", "external-cpp"]);
     } else {
         // standard for in-repo builds.  a different set will be standard in the sdist
         const standard_features = ["abi3", "generate-proto", "protobuf-src"];
