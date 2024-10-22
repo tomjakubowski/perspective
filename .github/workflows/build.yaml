@@ -604,6 +604,7 @@ jobs:
                 include:
                     - os: macos-14
                       arch: aarch64
+                      python-version: 3.9
                 exclude:
                     - os: macos-14
                       is-release: false
