@@ -601,7 +601,12 @@ jobs:
                     - ${{ startsWith(github.ref, 'refs/tags/v') }}
                 arch:
                     - x86_64
+                include:
+                    - os: macos-14
+                      arch: aarch64
                 exclude:
+                    - os: macos-14
+                      is-release: false
                     - os: macos-13
                       is-release: false
                     - os: windows-2022
