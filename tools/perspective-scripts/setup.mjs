@@ -82,6 +82,15 @@ const PROMPT_DOCKER = {
     default: CONFIG["PSP_DOCKER"] || false,
 };
 
+const PROMPT_ARCH = {
+    type: "list",
+    name: "PSP_ARCH",
+    message: "Target architecture?",
+    default:
+        CONFIG["PSP_ARCH"] || (process.arch === "arm64" ? "aarch64" : "x86_64"),
+    choices: ["aarch64", "x86_64"],
+};
+
 async function choose_docker() {
     const answers = await inquirer.prompt([PROMPT_DOCKER]);
     CONFIG.add(answers);
@@ -210,7 +219,11 @@ async function focus_package() {
 }
 
 async function javascript_options() {
-    const new_config = await inquirer.prompt([PROMPT_DEBUG, PROMPT_DOCKER]);
+    const new_config = await inquirer.prompt([
+        PROMPT_DEBUG,
+        PROMPT_DOCKER,
+        PROMPT_ARCH,
+    ]);
     CONFIG.add(new_config);
     CONFIG.write();
 }
