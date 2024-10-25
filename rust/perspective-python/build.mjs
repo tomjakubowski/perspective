@@ -111,13 +111,7 @@ if (build_wheel) {
     cmd.sh(`maturin build ${flags} --features=${features.join(",")} ${target}`);
 }
 
-const old = fs.readFileSync("./pyproject.toml");
-
 if (build_sdist) {
-    const toml = TOML.parse(old);
-    console.log(toml);
-    delete toml.tool.maturin["data"];
-    fs.writeFileSync("./pyproject.toml", TOML.stringify(toml));
     cmd.sh(`maturin sdist`);
 }
 
@@ -126,7 +120,3 @@ if (!build_wheel && !build_sdist) {
 }
 
 cmd.runSync();
-
-if (build_sdist) {
-    fs.writeFileSync("./pyproject.toml", old);
-}
