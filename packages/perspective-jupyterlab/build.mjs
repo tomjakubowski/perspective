@@ -139,10 +139,13 @@ async function build_all() {
     );
 
     const psp_dir = `perspective_python-${version}.data`;
-    await cpy(
-        ["dist/cjs/**/*"],
-        `../../rust/perspective-python/${psp_dir}/data/share/jupyter/labextensions/@finos/perspective-jupyterlab`
-    );
+    const dests = [
+        `../../rust/perspective-python/perspective/labextension`, // used for sdist
+        `../../rust/perspective-python/${psp_dir}/data/share/jupyter/labextensions/@finos/perspective-jupyterlab`, // used for wheel
+    ];
+    for (const dest of dests) {
+        await cpy(["dist/cjs/**/*"], dest);
+    }
 }
 
 build_all();

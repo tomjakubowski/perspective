@@ -46,6 +46,7 @@ module-name = "perspective"
 data = "perspective_python-3.1.2.data"
 features = ["pyo3/extension-module"]
 include = [
+    { path = "perspective/labextension/**/*", format = "sdist" },
     { path = "perspective/*libpsp.so", format = "wheel" },
     { path = "perspective/*libpsp.dll", format = "wheel" },
 ]
