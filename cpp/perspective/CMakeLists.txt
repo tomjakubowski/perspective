@@ -50,7 +50,7 @@ endif()
 
 
 if(WIN32)
-    set(CMAKE_CXX_FLAGS " /EHsc /MP /MT /c /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /MT /c /bigobj")
 else()
     # set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS}")
 endif()
@@ -303,22 +303,6 @@ endif()
 
 set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "Disable rapidjson tests")
 
-
-set(CMAKE_C_FLAGS "  \
--O3 \
-")
-if (PSP_WASM_EXCEPTIONS)
-set(CMAKE_CXX_FLAGS " -fwasm-exceptions \
--O3 \
--g0 \
-")
-else()
-set(CMAKE_CXX_FLAGS " \
--O3 \
-")
-
-endif()
-
 if(PSP_PYODIDE)
     set(RELOCATABLE_FLAGS "-sRELOCATABLE=1 -sSIDE_MODULE=2 -sWASM_BIGINT=1")
 
@@ -364,23 +348,26 @@ list(APPEND all_deps_INCLUDE_DIRS
 add_subdirectory(${PSP_CMAKE_MODULE_PATH}/../cpp/protos "${CMAKE_BINARY_DIR}/protos-build")
 
 # ####################
-set(CMAKE_C_FLAGS_DEBUG "")
-set(CMAKE_C_FLAGS_RELEASE "")
 set(CMAKE_C_FLAGS " \
     ${CMAKE_C_FLAGS} \
+    ${CMAKE_C_FLAGS_RELEASE} \
+    ${EXTENDED_FLAGS} \
+    ${OPT_FLAGS} \
+    ")
+set(CMAKE_C_FLAGS_DEBUG "")
+set(CMAKE_C_FLAGS_RELEASE "")
+
+# prevents the default debug flags from overriding the debug flags we
+# set in OPT_FLAGS
+set(CMAKE_CXX_FLAGS " \
+    ${CMAKE_CXX_FLAGS} \
+    ${CMAKE_CXX_FLAGS_RELEASE} \
     ${EXTENDED_FLAGS} \
     ${OPT_FLAGS} \
     ")
 
-# prevents the default debug flags from overriding the debug flags we
-# set in OPT_FLAGS
 set(CMAKE_CXX_FLAGS_DEBUG "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
-set(CMAKE_CXX_FLAGS " \
-    ${CMAKE_CXX_FLAGS} \
-    ${EXTENDED_FLAGS} \
-    ${OPT_FLAGS} \
-    ")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++1y")
@@ -484,7 +471,7 @@ set(WASM_SOURCE_FILES ${SOURCE_FILES})
 message("${BUILD_MESSAGE}\n")
 
 if(WIN32)
-    set(CMAKE_CXX_FLAGS " /EHsc /MP /MT /c /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /MT /c /bigobj")
 else()
     # set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS}")
 endif()
