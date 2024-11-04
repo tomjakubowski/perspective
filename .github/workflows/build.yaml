@@ -686,23 +686,29 @@ jobs:
               with:
                   name: perspective-python-sdist
 
-            # Ensures that perspective-python is built against versions of
-            # perspective-server and perspective-client from this same CI run,
-            # not on crates.io
-            - name: Set up global perspective-server and perspective-client crate path overrides
+            # The sdist depends on perspective-{client,server} crates published to
+            # crates.io.  Patch the build to instead use .crate artifacts built
+            # previously in the workflow
+            - name: Set up path overrides for perspective .crate contents
+              shell: bash
               run: |
-                  mkdir -p $HOME/.cargo
+                  (cd crates && tar xvf perspective-client-*.crate && tar xvf perspective-server-*.crate)
+                  CLIENT_CRATE_ROOT=$(ls -d "$PWD"/crates/perspective-client-*/ | head -n 1)
+                  SERVER_CRATE_ROOT=$(ls -d "$PWD"/crates/perspective-server-*/ | head -n 1)
 
+                  mkdir -p $HOME/.cargo
                   cat > $HOME/.cargo/config.toml <<EOF
                   [patch.crates-io]
-                  perspective-client = { path = "$PWD/crates/perspective-client.crate" }
-                  perspective-server = { path = "$PWD/crates/perspective-server.crate" }
+                  perspective-client = { path = "$CLIENT_CRATE_ROOT" }
+                  perspective-server = { path = "$SERVER_CRATE_ROOT" }
                   EOF
 
             - name: Install perspective-python sdist
+              shell: bash
               run: python -m pip install -vv ./perspective*.tar.gz
 
             - name: Verify labextension
+              shell: bash
               run: |
                   jupyter labextension list --debug
                   jupyter labextension list 2>&1 | grep '@finos/perspective-jupyterlab'
