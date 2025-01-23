@@ -608,11 +608,15 @@ elseif(PSP_CPP_BUILD OR PSP_PYTHON_BUILD)
             target_include_directories(psp PRIVATE ${psp_INCLUDE_DIRS})
             target_include_directories(psp SYSTEM PRIVATE ${all_deps_INCLUDE_DIRS})
             target_compile_definitions(psp PRIVATE PSP_ENABLE_PYTHON=1 PSP_ENABLE_WASM=1)
-            # support for emscripten exceptions https://emscripten.org/docs/porting/exceptions.html#emscripten-javascript-based-exception-support
-            target_compile_options(psp PUBLIC -fexceptions -fvisibility=hidden)
-            target_compile_options(arrow_static PUBLIC -fexceptions -fvisibility=hidden)
-            target_compile_options(re2 PUBLIC -fexceptions -fvisibility=hidden)
-            target_compile_options(protos PUBLIC -fexceptions -fvisibility=hidden)
+            # Support for emscripten exceptions
+            # https://emscripten.org/docs/porting/exceptions.html#emscripten-javascript-based-exception-support
+            # We need these compile options on psp and all library targets
+            # which the perspective-server crate .so links to statically
+            # (including numerous small components like arrow_io). Rather than
+            # enumerate those, add_compile_options() applies the options to all
+            # targets in this directory and its subdirectories, including those
+            # from psp_build_dep
+            add_compile_options(-fexceptions -fvisibility=hidden)
         else()
             # Cpython
             add_library(psp STATIC ${PYTHON_SOURCE_FILES})
@@ -631,7 +635,6 @@ elseif(PSP_CPP_BUILD OR PSP_PYTHON_BUILD)
             target_compile_options(psp PRIVATE -fvisibility=hidden)
         endif()
 
-        # Link against arrow static library
         # Linking against arrow_static also links against its bundled dependencies
         target_link_libraries(psp PRIVATE arrow_static re2 protos)
     else()
