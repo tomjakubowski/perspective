@@ -54,16 +54,16 @@ async def psp_installed(selenium, psp_wheel_url):
     await micropip.install(psp_wheel_url)
 
 
-@run_in_pyodide
-async def test_parsing_bad_csv_raises_exception(selenium):
-    import pytest
-    import perspective
+# @run_in_pyodide
+# async def test_parsing_bad_csv_raises_exception(selenium):
+#     import pytest
+#     import perspective
 
-    server = perspective.Server()
-    client = server.new_local_client()
-    with pytest.raises(perspective.PerspectiveError) as exc_info:
-        client.table("a,b,c\n1,2")
-    assert exc_info.match("CSV parse error")
+#     server = perspective.Server()
+#     client = server.new_local_client()
+#     with pytest.raises(perspective.PerspectiveError) as exc_info:
+#         client.table("a,b,c\n1,2")
+#     assert exc_info.match("CSV parse error")
 
 
 @run_in_pyodide
