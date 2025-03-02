@@ -1,6 +1,25 @@
+# [v3.4.0](https://github.com/finos/perspective/releases/tag/v3.4.0)
+
+_2 March 2025_ ([Full changelog](https://github.com/finos/perspective/compare/v3.3.4...v3.4.0))
+
+Features
+
+- Add dedicated `Worker`, `SharedWorker` and `ServiceWorker` support [#2936](https://github.com/finos/perspective/pull/2936)
+- Python AsyncClient and JS ProxySession [#2929](https://github.com/finos/perspective/pull/2929)
+- Quartiles [#2930](https://github.com/finos/perspective/pull/2930)
+- Fix `View::to_polars` and add `LargeUTF8` Arrow dictionary support [#2924](https://github.com/finos/perspective/pull/2924)
+
+Fixes
+
+- Show appropriate date when date is part of grouped data on chart. [#2857](https://github.com/finos/perspective/pull/2857)
+
+Misc
+
+- Shrink `d3fc` bundle [#2934](https://github.com/finos/perspective/pull/2934)
+
 # [v3.3.4](https://github.com/finos/perspective/releases/tag/v3.3.4)
 
-_10 February 2025_ ([Full changelog](https://github.com/finos/perspective/compare/v3.3.3...v3.3.4))
+_9 February 2025_ ([Full changelog](https://github.com/finos/perspective/compare/v3.3.3...v3.3.4))
 
 Fixes
 
