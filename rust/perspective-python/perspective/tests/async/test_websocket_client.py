@@ -23,7 +23,7 @@ import tornado.ioloop
 import perspective
 import perspective.handlers.tornado
 
-PORT = 8082
+PORT = 8083
 
 
 def test_big_multi_thing():
@@ -75,7 +75,7 @@ def test_big_multi_thing():
         perspective_server = perspective.Server()
         app = make_app(perspective_server)
         global server
-        server = app.listen(PORT)
+        server = app.listen(PORT, "0.0.0.0")
 
         global server_loop
         server_loop = tornado.ioloop.IOLoop.current()
