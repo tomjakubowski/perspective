@@ -30,6 +30,7 @@ pub fn copy_dir_all(
                 copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()), skip)?;
             }
         } else {
+            println!("COPYING {}", entry.path().display());
             fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
         }
     }
@@ -48,6 +49,7 @@ fn main() -> Result<(), std::io::Error> {
         let root_dir = Path::new(root_dir_env.as_str());
         copy_dir_all(Path::join(root_dir, "cpp"), "cpp", &HashSet::from(["dist"]))?;
         copy_dir_all(Path::join(root_dir, "cmake"), "cmake", &HashSet::new())?;
+        println!("I HAVE COPIED EVERYTHING");
         println!(
             "cargo:rerun-if-changed={}/cpp/perspective",
             root_dir.display()

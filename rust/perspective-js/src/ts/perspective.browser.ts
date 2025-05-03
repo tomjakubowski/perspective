@@ -28,6 +28,7 @@ export function init_server(
         | WebAssembly.Module,
     disable_stage_0: boolean = false
 ) {
+    console.warn("!!! init_server()");
     if (wasm instanceof Uint8Array) {
         GLOBAL_SERVER_WASM = Promise.resolve(wasm.buffer);
     } else if (wasm instanceof Response) {

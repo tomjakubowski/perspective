@@ -10,6 +10,8 @@
 // ┃ of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). ┃
 // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+// #error "FFFFFFFF"
+
 #include "google/protobuf/repeated_ptr_field.h"
 #include "google/protobuf/struct.pb.h"
 #include "perspective.pb.h"
@@ -37,6 +39,7 @@
 #include <tsl/ordered_map.h>
 #include <vector>
 #include <ctime>
+#include "google/protobuf/util/json_util.h"
 
 #if !defined(WIN32) && !defined(PSP_ENABLE_WASM)
 #include <sys/resource.h>
@@ -748,6 +751,8 @@ ProtoServer::handle_request(
     std::vector<ProtoServerResp<std::string>> serialized_responses;
     std::vector<proto::Response> responses;
 
+    std::cout << "TOM REQUEST  :: " << req_env.DebugString() << "\n";
+
     auto msg_id = req_env.msg_id();
     auto entity_id = req_env.entity_id();
     try {
@@ -785,11 +790,13 @@ ProtoServer::handle_request(
 
     // proto::Response resp_env;
     serialized_responses.reserve(responses.size());
+    std::cout << "TOM WTF? " << responses.size() << "\n";
     for (auto& resp : responses) {
         resp.set_msg_id(msg_id);
         resp.set_entity_id(entity_id);
 
         ProtoServerResp<std::string> str_resp;
+        std::cout << "TOM RESPONSE :: " << resp.DebugString() << "\n";
         str_resp.data = resp.SerializeAsString();
         str_resp.client_id = client_id;
         serialized_responses.emplace_back(std::move(str_resp));
@@ -936,7 +943,7 @@ parse_format_options(
         viewport.has_end_row()
             ? viewport.end_row()
             : (viewport_height != 0 ? out.start_row + viewport_height : max_rows
-            )
+              )
     );
     out.end_col = std::min(
         max_cols,
@@ -1472,7 +1479,7 @@ ProtoServer::_handle_request(std::uint32_t client_id, Request&& req) {
             resp.mutable_make_table_resp();
             push_resp(std::move(resp));
 
-            // Notify `on_thsoted_tables_update` listeners
+            // Notify `on_hosted_tables_update` listeners
             auto subscriptions = m_resources.get_on_hosted_tables_update_sub();
             for (auto& subscription : subscriptions) {
                 Response out;
@@ -2598,7 +2605,11 @@ ProtoServer::_handle_request(std::uint32_t client_id, Request&& req) {
             break;
         }
     }
-
+    std::cout << "TOM RESPONSE :: proto resp size " << proto_resp.size()
+              << "\n";
+    for (const auto& resp : proto_resp) {
+        std::cout << "TOM RESPONSE :: " << resp.data.DebugString() << "\n";
+    }
     return proto_resp;
 }
 

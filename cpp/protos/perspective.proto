@@ -16,7 +16,8 @@ import "google/protobuf/struct.proto";
 
 package perspective.proto;
 
-option optimize_for = LITE_RUNTIME;
+// XXX(tom): undo!
+// option optimize_for = LITE_RUNTIME;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

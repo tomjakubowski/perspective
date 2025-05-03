@@ -72,3 +72,31 @@ class TestProxySession(object):
         assert (await table.size()) == 3
         table2.update([{"a": 4, "d": 5}])
         assert (await table.size()) == 4
+
+    @pytest.mark.asyncio
+    # FIXME: rename this stupid name
+    async def test_tom_special(self):
+        """tests concurrent calls from clients on Session + ProxySession"""
+        server = Server()
+        client = server.new_local_client()
+
+        def send_response(bytes):
+            import asyncio
+            print("send response...")
+            asyncio.create_task(sub_client.handle_response(bytes))
+
+        sub_session = ProxySession(client, send_response)
+        # hard to write
+        # message ids are reused between these independent sessions.
+        print("sending main client request 1")
+        # this will have msg_id 1
+        names2 = client.get_hosted_table_names()
+        print("sending main client request 2")
+        # this will have msg_id 2
+        names2 = client.get_hosted_table_names()
+        sub_client = AsyncClient(sub_session.handle_request_async, sub_session.close)
+        # this will also have msg_id 1 -- imagine what could occur if it is in
+        # flight concurrently with the first request which had msg_id 1
+        print("sending sub client request")
+        names = sub_client.get_hosted_table_names()
+        names = await names
