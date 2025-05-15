@@ -19,7 +19,7 @@ import inspect
 
 from string import Template
 from ipywidgets import DOMWidget
-from traitlets import Unicode, observe
+from traitlets import Unicode
 from .viewer import PerspectiveViewer
 
 __version__ = re.sub(
@@ -27,6 +27,7 @@ __version__ = re.sub(
 )
 
 __all__ = ["PerspectiveWidget"]
+
 
 class PerspectiveWidget(DOMWidget, PerspectiveViewer):
     """:class`~perspective.PerspectiveWidget` allows for Perspective to be used
@@ -139,7 +140,8 @@ class PerspectiveWidget(DOMWidget, PerspectiveViewer):
         # Initialize the viewer
         super(PerspectiveWidget, self).__init__(**kwargs)
 
-        # Handle messages from the the front end
+        # Handle custom_msg from the the front end, which carry Perspective
+        # protocol messages
         self.on_msg(self.handle_message)
         self._sessions = {}
 
@@ -160,6 +162,7 @@ class PerspectiveWidget(DOMWidget, PerspectiveViewer):
             loading = self.load(data, **self._options)
             if inspect.isawaitable(loading):
                 import asyncio
+
                 asyncio.create_task(loading)
 
     def load(self, data, **options):
@@ -195,7 +198,6 @@ class PerspectiveWidget(DOMWidget, PerspectiveViewer):
         self.close()
         return ret
 
-    @observe("value")
     def handle_message(self, widget, content, buffers):
         """Given a message from `PerspectiveView.send()`, process the
         message and return the result to `self.post`.
@@ -212,9 +214,8 @@ class PerspectiveWidget(DOMWidget, PerspectiveViewer):
             logging.debug("view {} connected", client_id)
 
             def send_response(msg):
-                self.send(
-                    {"type": "binary_msg", "client_id": client_id}, [msg]
-                )
+                self.send({"type": "binary_msg", "client_id": client_id}, [msg])
+
             self._sessions[client_id] = self.new_proxy_session(send_response)
         elif content["type"] == "binary_msg":
             [binary_msg] = buffers
@@ -222,6 +223,7 @@ class PerspectiveWidget(DOMWidget, PerspectiveViewer):
             session = self._sessions[client_id]
             if session is not None:
                 import asyncio
+
                 asyncio.create_task(session.handle_request_async(binary_msg))
             else:
                 logging.error("No session for client_id {}".format(client_id))
