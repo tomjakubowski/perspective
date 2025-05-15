@@ -197,7 +197,7 @@ class PerspectiveWidget(DOMWidget, PerspectiveViewer):
 
     @observe("value")
     def handle_message(self, widget, content, buffers):
-        """Given a message from `PerspectiveJupyterClient.send()`, process the
+        """Given a message from `PerspectiveView.send()`, process the
         message and return the result to `self.post`.
 
         Args:
