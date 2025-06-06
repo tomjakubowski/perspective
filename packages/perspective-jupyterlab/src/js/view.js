@@ -116,7 +116,7 @@ export class PerspectiveView extends DOMWidgetView {
         // add event handler to synchronize traitlet values
         this.luminoWidget.viewer.addEventListener(
             "perspective-config-update",
-            this._synchronize_state_dbg
+            this._synchronize_state
         );
 
         // bind toggle_editable to this
@@ -324,7 +324,7 @@ export class PerspectiveView extends DOMWidgetView {
         this.luminoWidget.delete();
         this.luminoWidget.viewer.removeEventListener(
             "perspective-config-update",
-            this._synchronize_state_dbg
+            this._synchronize_state
         );
     }
 
