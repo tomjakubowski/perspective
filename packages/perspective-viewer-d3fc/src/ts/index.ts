@@ -18,40 +18,40 @@ declare global {
     interface CustomElementRegistry {
         get(
             tagName: "perspective-viewer-d3fc-area"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-xbar"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-candlestick"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-ybar"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-heatmap"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-yline"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-ohlc"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-sunburst"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-treemap"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-xyline"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-xyscatter"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
         get(
             tagName: "perspective-viewer-d3fc-yscatter"
-        ): HTMLPerspectiveViewerD3FCPluginElement;
+        ): typeof HTMLPerspectiveViewerD3FCPluginElement;
 
         whenDefined(tagName: "perspective-viewer-d3fc-area"): Promise<void>;
         whenDefined(tagName: "perspective-viewer-d3fc-xbar"): Promise<void>;
